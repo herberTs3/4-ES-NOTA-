@@ -1,34 +1,30 @@
 package sokoban;
 
-import sokoban.carga.CargadorDeNivel;
-import sokoban.carga.CargarNivelPorTxt;
-import sokoban.carga.fabrica.RegistroDeCreadores;
-import sokoban.controlador.Controlador;
-import sokoban.vista.VentanaPrincipal;
+import java.nio.file.Path;
 
 import javax.swing.SwingUtilities;
-import java.nio.file.Path;
+
+import sokoban.controller.Controlador;
+import sokoban.level.CargadorDeNivel;
+import sokoban.level.CargarNivelPorTxt;
+import sokoban.level.factory.RegistroDeCreadores;
+import sokoban.model.Game;
+import sokoban.view.VentanaPrincipal;
 
 public class Main {
 
-    /** Uso: java sokoban.Main [directorio_de_niveles]   (por defecto "niveles") */
+    private static final String DEFAULT_LEVELS_DIRECTORY = "levels";
+    private static final int FIRST_LEVEL = 1;
+
     public static void main(String[] args) {
-        Path directorio = Path.of(args.length > 0 ? args[0] : "niveles");
+        Path directorio = Path.of(args.length > 0 ? args[0] : DEFAULT_LEVELS_DIRECTORY);
+        CargadorDeNivel cargador = new CargarNivelPorTxt(directorio, RegistroDeCreadores.porDefecto());
 
-        // 1) Registro de creadores (Factory Method): el catálogo de "qué símbolo construye qué".
-        //    Para sumar un tipo nuevo de terreno o caja se registra su creador acá, por ejemplo:
-        //        registro.registrarTerreno(new CreadorMiTerreno());
-        //    y no hace falta modificar el cargador. Ver README, sección "Cómo agregar un tipo nuevo".
-        RegistroDeCreadores registro = RegistroDeCreadores.porDefecto();
-
-        // 2) Cargador de niveles: lee los .txt y usa el registro para construir cada celda.
-        //    Para cambiar el origen de los niveles basta con reemplazar esta línea por otro CargadorDeNivel.
-        CargadorDeNivel cargador = new CargarNivelPorTxt(directorio, registro);
-
-        // 3) Controlador: único punto de contacto entre la vista y el modelo/carga.
         SwingUtilities.invokeLater(() -> {
-            Controlador controlador = new Controlador(cargador, 1);
+            Game game = new Game();
+            Controlador controlador = new Controlador(cargador, game, FIRST_LEVEL);
             VentanaPrincipal ventana = new VentanaPrincipal(controlador);
+            game.addListener(ventana);
             controlador.setVista(ventana);
             controlador.iniciar();
             ventana.setVisible(true);

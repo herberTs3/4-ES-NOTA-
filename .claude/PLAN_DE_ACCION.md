@@ -41,11 +41,11 @@
 
 | # | Decisión final | Fecha |
 |---|---|---|
-| D1 | | |
-| D2 | | |
-| D3 | | |
-| D4 | | |
-| D5 | | |
+| D1 | Provisional, a confirmar: por letra, el cerrojo `a` abre los muros `A` | 2026-11-04 |
+| D2 | Provisional, a confirmar: los muros quedan abiertos | 2026-11-04 |
+| D3 | Provisional, a confirmar: el empuje que deja la frágil en 0 la mueve y después desaparece | 2026-11-04 |
+| D4 | Provisional, a confirmar: todos los destinos cubiertos y cada llave sobre un cerrojo | 2026-11-04 |
+| D5 | Provisional, a confirmar: solo resbalan las cajas | 2026-11-04 |
 | D6 | | |
 | D7 | | |
 | D8 | | |

@@ -9,15 +9,49 @@ Profesor: Jonathan Pepe
 Versión del clásico juego de ingenio Sokoban desarrollada en Java con la librería Swing (GUI 2D). El objetivo principal del proyecto es aplicar los patrones y principios de diseño vistos en la cursada (SOLID, GRASP, MVC, GOF).
 
 -- Funcionalidades implementadas
-* **Carga de niveles:** Los mapas se cargan automáticamente desde archivos `.txt`.
+* **Carga de niveles:** Los mapas se cargan desde archivos `.txt` en la carpeta `levels`.
+* **Movimiento:** El jugador empuja cajas, y al ganar pasa al siguiente nivel.
 * **Cajas especiales:** Cajas normales, frágiles (se rompen tras varios empujes) y llave (abren muros al colocarse en cerrojos).
-* **Sistema Undo:** Permite retroceder hasta 15 movimientos (5 por cada uso del botón, máximo 3 usos).
-* **Interfaz y Sonido:** HUD con contador de nivel, movimientos, empujes y puntaje final. Efectos de sonido y assets de dominio público.
+* **Hielo:** Las cajas se deslizan hasta chocar o salir del hielo.
+* **Interfaz:** Nivel actual, contador de movimientos y empujes, y resumen al terminar cada nivel.
 
+-- En desarrollo
+* Sistema Undo, puntaje, imágenes y sonido.
+
+-- Cómo ejecutar
+Requiere JDK 16 o superior. Desde la raíz del proyecto:
+
+```bash
+javac -encoding UTF-8 -d out $(find src -name "*.java")
+java -cp out sokoban.Main
+```
+
+Pruebas:
+
+```bash
+javac -encoding UTF-8 -d out $(find src test -name "*.java")
+java -cp out sokoban.level.PruebaRegistro
+java -cp out sokoban.controller.PruebaControlador
+java -cp out sokoban.model.PruebaJuego
+```
 
 -- Controles
 * **Flechas direccionales:** Movimiento del jugador.
-* **Botones en pantalla:** Reiniciar nivel y Deshacer movimiento.
+* **Botones en pantalla:** Anterior, Siguiente y Reiniciar.
+
+-- Formato de los niveles
+| Símbolo | Elemento |
+|---|---|
+| `#` | Pared |
+| espacio | Piso |
+| `.` | Destino |
+| `@` / `+` | Jugador / jugador sobre destino |
+| `$` / `*` | Caja normal / caja normal sobre destino |
+| `1`-`9` | Caja frágil con esa cantidad de empujes |
+| `K` | Caja llave |
+| `~` | Hielo |
+| `a`-`e` | Cerrojo que abre los muros de su letra |
+| `A`-`E` | Muro cerrado vinculado a un cerrojo |
 
 -- Otros entregables
 En la entrega por mail se incluyen:

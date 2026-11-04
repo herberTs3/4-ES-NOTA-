@@ -107,7 +107,7 @@ Base estándar de Sokoban + extensiones del TP. Un archivo por nivel. Las línea
 | `.` | Destino |
 | `@` / `+` | Jugador / jugador sobre destino |
 | `$` / `*` | Caja normal / caja normal sobre destino |
-| `F` | Caja frágil (resistencia por defecto: constante `FragileBox.DEFAULT_RESISTANCE`) |
+| `1`–`9` | Caja frágil; el dígito es la cantidad de empujes que aguanta |
 | `K` | Caja llave |
 | `~` | Hielo (terreno resbaladizo) |
 | `a`–`e` | Cerrojo (abre los muros con la misma letra en mayúscula) — decisión D1 |
