@@ -21,8 +21,14 @@ public class Lock extends Terreno {
         return letter;
     }
 
+    @Override
     public boolean isOpen() {
         return open;
+    }
+
+    @Override
+    public void restoreOpen(boolean open) {
+        this.open = open;
     }
 
     public void addListener(LockListener listener) {

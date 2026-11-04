@@ -13,10 +13,11 @@ Versión del clásico juego de ingenio Sokoban desarrollada en Java con la libre
 * **Movimiento:** El jugador empuja cajas, y al ganar pasa al siguiente nivel.
 * **Cajas especiales:** Cajas normales, frágiles (se rompen tras varios empujes) y llave (abren muros al colocarse en cerrojos).
 * **Hielo:** Las cajas se deslizan hasta chocar o salir del hielo.
-* **Interfaz:** Nivel actual, contador de movimientos y empujes, y resumen al terminar cada nivel.
+* **Deshacer:** Guarda los últimos 15 movimientos; cada uso retrocede 5, con un máximo de 3 usos consecutivos.
+* **Interfaz:** Nivel actual, contadores de movimientos y empujes, cajas ubicadas, usos de deshacer y resumen al terminar cada nivel.
 
 -- En desarrollo
-* Sistema Undo, puntaje, imágenes y sonido.
+* Puntaje, imágenes y sonido.
 
 -- Cómo ejecutar
 Requiere JDK 16 o superior. En VS Code, elegir la configuración **Sokoban** en Ejecutar y depurar.
@@ -52,7 +53,7 @@ javac -encoding UTF-8 -d out $(find src test -name "*.java")
 
 -- Controles
 * **Flechas direccionales:** Movimiento del jugador.
-* **Botones en pantalla:** Anterior, Siguiente y Reiniciar.
+* **Botones en pantalla:** Anterior, Siguiente, Deshacer y Reiniciar.
 
 -- Formato de los niveles
 | Símbolo | Elemento |

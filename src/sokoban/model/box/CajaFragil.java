@@ -29,6 +29,11 @@ public class CajaFragil extends Caja {
     }
 
     @Override
+    public Caja copiar() {
+        return new CajaFragil(getPosicion(), movimientosRestantes);
+    }
+
+    @Override
     public boolean requiereDestino() {
         return true;
     }

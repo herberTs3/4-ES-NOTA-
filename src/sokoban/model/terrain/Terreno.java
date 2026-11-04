@@ -27,6 +27,13 @@ public abstract class Terreno {
         return false;
     }
 
+    public boolean isOpen() {
+        return false;
+    }
+
+    public void restoreOpen(boolean open) {
+    }
+
     public void alEntrarCaja(Caja caja) {
     }
 

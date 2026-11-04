@@ -15,6 +15,7 @@ import sokoban.level.CargarNivelPorTxt;
 public class PruebaJuego {
 
     private static final CargarNivelPorTxt CARGADOR = new CargarNivelPorTxt(Path.of("levels"));
+    private static final List<String> PASILLO = List.of("#########", "#@      #", "#$.     #", "#########");
 
     private static int pasaron = 0;
     private static int fallaron = 0;
@@ -29,6 +30,11 @@ public class PruebaJuego {
         laLlaveCuentaParaGanar();
         unaCajaDeRepuestoNoImpideGanar();
         laFotoDelJuegoNoExponeElModelo();
+        deshacerVuelveCincoMovimientos();
+        deshacerRespetaHistorialYUsosConsecutivos();
+        deshacerRestauraCajasYMuros();
+        deshacerNoRestauraContadores();
+        reiniciarLimpiaElHistorial();
 
         System.out.printf("%n%d pruebas OK, %d fallidas%n", pasaron, fallaron);
         System.exit(fallaron == 0 ? 0 : 1);
@@ -150,6 +156,84 @@ public class PruebaJuego {
         }
         verificar("la foto informa el tipo de terreno",
                 foto.board().tileAt(1, 3).type() == TileType.GOAL && foto.board().countGoals() == 1);
+    }
+
+    static void deshacerVuelveCincoMovimientos() throws Exception {
+        Game juego = iniciarPasillo();
+        verificar("sin movimientos no se puede deshacer", !juego.snapshot().canUndo());
+        juego.undo();
+        verificar("deshacer sin historial no gasta usos", juego.snapshot().undoUses() == 0);
+        jugar(juego, "RRRRRR");
+        juego.undo();
+        verificar("deshacer vuelve 5 movimientos", columnaJugador(juego) == 2);
+        juego.undo();
+        verificar("con menos de 5 movimientos vuelve al inicio", columnaJugador(juego) == 1);
+    }
+
+    static void deshacerRespetaHistorialYUsosConsecutivos() throws Exception {
+        Game juego = iniciarPasillo();
+        jugar(juego, "RRRRRRLLLLLLRRRRRRLL");
+        juego.undo();
+        verificar("primer uso: vuelve al movimiento 15", columnaJugador(juego) == 4);
+        juego.undo();
+        verificar("segundo uso: vuelve al movimiento 10", columnaJugador(juego) == 3);
+        juego.undo();
+        verificar("tercer uso: vuelve al movimiento 5", columnaJugador(juego) == 6);
+        verificar("después de 3 usos no quedan usos", juego.snapshot().remainingUndos() == 0
+                && !juego.snapshot().canUndo());
+        juego.undo();
+        verificar("el cuarto uso no hace nada", columnaJugador(juego) == 6 && juego.snapshot().undoUses() == 3);
+        jugar(juego, "R");
+        verificar("un movimiento nuevo reinicia los usos", juego.snapshot().remainingUndos() == 3
+                && juego.snapshot().canUndo());
+    }
+
+    static void deshacerRestauraCajasYMuros() throws Exception {
+        Game fragil = iniciar("#######", "#@2  .#", "#######");
+        jugar(fragil, "RR");
+        verificar("la frágil se rompió", fragil.snapshot().status() == GameStatus.UNSOLVABLE);
+        verificar("sin solución todavía se puede deshacer", fragil.snapshot().canUndo());
+        fragil.undo();
+        BoxData caja = fragil.snapshot().board().boxes().get(0);
+        verificar("deshacer devuelve la frágil con su resistencia", caja.resistance() == 2
+                && caja.position().column() == 2);
+        verificar("deshacer vuelve a estar jugando", fragil.snapshot().status() == GameStatus.PLAYING);
+
+        Game cerrojo = iniciar("#########", "#@K a  A#", "#  $ .  #", "#########");
+        jugar(cerrojo, "RR");
+        verificar("el muro se abrió", abierto(cerrojo, 1, 7));
+        cerrojo.undo();
+        verificar("deshacer vuelve a cerrar el muro", !abierto(cerrojo, 1, 7) && !abierto(cerrojo, 1, 4));
+        jugar(cerrojo, "RR");
+        verificar("el cerrojo se puede volver a abrir", abierto(cerrojo, 1, 7));
+    }
+
+    static void deshacerNoRestauraContadores() throws Exception {
+        Game juego = iniciar("#######", "#@$  .#", "#     #", "#######");
+        jugar(juego, "RR");
+        juego.undo();
+        GameSnapshot foto = juego.snapshot();
+        verificar("deshacer no descuenta movimientos ni empujes", foto.moves() == 2 && foto.pushes() == 2);
+        verificar("deshacer cuenta el uso", foto.undoUses() == 1);
+        verificar("deshacer devuelve la caja", posicionDeCaja(juego, BoxType.NORMAL).column() == 2);
+    }
+
+    static void reiniciarLimpiaElHistorial() throws Exception {
+        Game juego = iniciarPasillo();
+        jugar(juego, "RR");
+        juego.undo();
+        juego.startLevel(CARGADOR.cargarDesdeLineas(PASILLO), 1);
+        GameSnapshot foto = juego.snapshot();
+        verificar("reiniciar limpia usos e historial", foto.undoUses() == 0 && foto.remainingUndos() == 3
+                && !foto.canUndo());
+    }
+
+    private static Game iniciarPasillo() throws CargaDeNivelException {
+        return iniciar(PASILLO.toArray(String[]::new));
+    }
+
+    private static int columnaJugador(Game juego) {
+        return juego.snapshot().board().player().column();
     }
 
     private static Game iniciar(String... filas) throws CargaDeNivelException {

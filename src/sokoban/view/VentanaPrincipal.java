@@ -1,7 +1,6 @@
 package sokoban.view;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -26,39 +25,30 @@ import sokoban.model.event.GameListener;
 
 public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener {
 
-    private static final Color COLOR_ERROR = new Color(0xb3261e);
+    private static final String WINDOW_TITLE = "Sokoban - UADE GRUPO 4 ES NOTA";
+    private static final String CONTROLS_HINT = "Usá las flechas para mover";
 
+    private final HudPanel hud = new HudPanel();
     private final VistaTablero vista = new VistaTablero();
-    private final JButton botonAnterior = new JButton("« Anterior");
-    private final JButton botonSiguiente = new JButton("Siguiente »");
+    private final JButton botonAnterior = new JButton("Anterior");
+    private final JButton botonSiguiente = new JButton("Siguiente");
+    private final JButton botonDeshacer = new JButton("Deshacer");
     private final JButton botonReiniciar = new JButton("Reiniciar");
-    private final JLabel etiquetaNivel = new JLabel("Nivel");
-    private final JLabel etiquetaEstado = new JLabel(" ");
-    private final Color colorEstadoNormal = etiquetaEstado.getForeground();
+    private final JLabel etiquetaEstado = new JLabel(CONTROLS_HINT);
 
     public VentanaPrincipal(Controlador controlador) {
-        super("Sokoban");
+        super(WINDOW_TITLE);
         Objects.requireNonNull(controlador);
 
-        etiquetaNivel.setFont(etiquetaNivel.getFont().deriveFont(Font.BOLD, 15f));
-        etiquetaNivel.setPreferredSize(new Dimension(90, 24));
-        etiquetaNivel.setHorizontalAlignment(JLabel.CENTER);
-
-        JPanel barra = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 8));
-        barra.add(botonAnterior);
-        barra.add(etiquetaNivel);
-        barra.add(botonSiguiente);
-        barra.add(botonReiniciar);
-
-        etiquetaEstado.setBorder(BorderFactory.createEmptyBorder(6, 12, 8, 12));
-
-        add(barra, BorderLayout.NORTH);
+        add(hud, BorderLayout.NORTH);
         add(vista, BorderLayout.CENTER);
-        add(etiquetaEstado, BorderLayout.SOUTH);
+        add(barraInferior(), BorderLayout.SOUTH);
 
         configurarBoton(botonAnterior, controlador::anteriorNivel);
         configurarBoton(botonSiguiente, controlador::siguienteNivel);
+        configurarBoton(botonDeshacer, controlador::deshacer);
         configurarBoton(botonReiniciar, controlador::recargarNivel);
+        botonDeshacer.setEnabled(false);
 
         registrarTecla("UP", controlador::moverArriba);
         registrarTecla("DOWN", controlador::moverAbajo);
@@ -66,7 +56,7 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
         registrarTecla("RIGHT", controlador::moverDerecha);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(420, 360));
+        setMinimumSize(new Dimension(640, 480));
         pack();
         setLocationRelativeTo(null);
     }
@@ -74,10 +64,12 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
     @Override
     public void onGameChanged(GameSnapshot snapshot) {
         vista.setTablero(snapshot.board());
+        hud.update(snapshot);
+        botonDeshacer.setEnabled(snapshot.canUndo());
         if (snapshot.status() == GameStatus.UNSOLVABLE) {
-            mostrarEstado("Se rompió una caja necesaria: el nivel no tiene solución. Tocá Reiniciar.", true);
+            mostrarEstado("Se rompió una caja necesaria: deshacé o reiniciá.", true);
         } else {
-            mostrarEstado(textoContadores(snapshot), false);
+            mostrarEstado(CONTROLS_HINT, false);
         }
     }
 
@@ -88,15 +80,16 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
 
     @Override
     public void actualizarNavegacion(int nivelActual, boolean hayNivelAnterior, boolean hayNivelSiguiente) {
-        etiquetaNivel.setText("Nivel " + nivelActual);
+        hud.showLevel(nivelActual);
         botonAnterior.setEnabled(hayNivelAnterior);
         botonSiguiente.setEnabled(hayNivelSiguiente);
     }
 
     @Override
     public void mostrarNivelCompletado(GameSnapshot resumen) {
-        JOptionPane.showMessageDialog(this, "Nivel " + resumen.level() + " completado.\n" + textoContadores(resumen),
-                "¡Nivel completado!", JOptionPane.INFORMATION_MESSAGE);
+        String detalle = String.format("Nivel %d completado.%nMovimientos: %d%nEmpujes: %d%nUsos de deshacer: %d",
+                resumen.level(), resumen.moves(), resumen.pushes(), resumen.undoUses());
+        JOptionPane.showMessageDialog(this, detalle, "¡Nivel completado!", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
@@ -105,13 +98,44 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private String textoContadores(GameSnapshot snapshot) {
-        return String.format("Movimientos: %d   Empujes: %d", snapshot.moves(), snapshot.pushes());
+    private JPanel barraInferior() {
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        botones.setOpaque(false);
+        botones.add(botonAnterior);
+        botones.add(botonSiguiente);
+        botones.add(botonDeshacer);
+        botones.add(botonReiniciar);
+
+        etiquetaEstado.setFont(new Font(Palette.FONT_FAMILY, Font.PLAIN, 12));
+        etiquetaEstado.setForeground(Palette.MUTED);
+
+        JPanel barra = new JPanel(new BorderLayout());
+        barra.setBackground(Palette.SURFACE);
+        barra.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, Palette.LINE),
+                BorderFactory.createEmptyBorder(10, 14, 10, 22)));
+        barra.add(botones, BorderLayout.WEST);
+        barra.add(etiquetaEstado, BorderLayout.EAST);
+        return barra;
     }
 
     private void configurarBoton(JButton boton, Runnable accion) {
         boton.setFocusable(false);
+        boton.setFocusPainted(false);
+        boton.setRolloverEnabled(true);
+        boton.setFont(new Font(Palette.FONT_FAMILY, Font.PLAIN, 12));
+        boton.setForeground(Palette.INK);
+        boton.setBackground(Palette.SURFACE);
+        boton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Palette.LINE),
+                BorderFactory.createEmptyBorder(6, 14, 6, 14)));
+        boton.getModel().addChangeListener(e -> resaltarBoton(boton));
         boton.addActionListener(e -> accion.run());
+    }
+
+    private void resaltarBoton(JButton boton) {
+        boolean resaltado = boton.isEnabled() && boton.getModel().isRollover();
+        boton.setBackground(resaltado ? Palette.SURFACE_HOVER : Palette.SURFACE);
     }
 
     private void registrarTecla(String tecla, Runnable accion) {
@@ -126,7 +150,7 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
     }
 
     private void mostrarEstado(String texto, boolean error) {
-        etiquetaEstado.setForeground(error ? COLOR_ERROR : colorEstadoNormal);
+        etiquetaEstado.setForeground(error ? Palette.ERROR : Palette.MUTED);
         etiquetaEstado.setText(texto);
     }
 }

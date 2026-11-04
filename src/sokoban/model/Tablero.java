@@ -118,6 +118,27 @@ public class Tablero {
         return cajas.stream().filter(Caja::requiereDestino).count() >= contarDestinos();
     }
 
+    BoardMemento crearMemento() {
+        boolean[][] aperturas = new boolean[filas][columnas];
+        for (int f = 0; f < filas; f++) {
+            for (int c = 0; c < columnas; c++) {
+                aperturas[f][c] = cuadricula[f][c].isOpen();
+            }
+        }
+        return new BoardMemento(jugador.getPosicion(), cajas.stream().map(Caja::copiar).toList(), aperturas);
+    }
+
+    void restaurar(BoardMemento memento) {
+        jugador.moverA(memento.playerPosition());
+        cajas.clear();
+        memento.boxes().forEach(caja -> cajas.add(caja.copiar()));
+        for (int f = 0; f < filas; f++) {
+            for (int c = 0; c < columnas; c++) {
+                cuadricula[f][c].restoreOpen(memento.isOpen(f, c));
+            }
+        }
+    }
+
     BoardSnapshot snapshot() {
         List<List<TileData>> tiles = new ArrayList<>();
         for (Terreno[] fila : cuadricula) {

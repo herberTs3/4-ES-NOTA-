@@ -17,4 +17,8 @@ public record BoardSnapshot(int rows, int columns, List<List<TileData>> tiles, L
     public int countGoals() {
         return (int) tiles.stream().flatMap(List::stream).filter(tile -> tile.type() == TileType.GOAL).count();
     }
+
+    public int countBoxesOnGoals() {
+        return (int) boxes.stream().filter(box -> box.inPlace() && box.type() != BoxType.KEY).count();
+    }
 }

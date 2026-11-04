@@ -7,10 +7,12 @@ import java.util.Objects;
 import sokoban.dto.GameSnapshot;
 import sokoban.dto.GameStatus;
 import sokoban.model.event.GameListener;
+import sokoban.model.history.MoveHistory;
 
 public class Game {
 
     private final List<GameListener> listeners = new ArrayList<>();
+    private final MoveHistory history = new MoveHistory();
     private Tablero board;
     private int level;
     private int moves;
@@ -26,6 +28,7 @@ public class Game {
         level = levelNumber;
         moves = 0;
         pushes = 0;
+        history.clear();
         status = GameStatus.PLAYING;
         notifyListeners();
     }
@@ -34,14 +37,25 @@ public class Game {
         if (status != GameStatus.PLAYING) {
             return;
         }
+        BoardMemento previousState = board.crearMemento();
         MoveResult result = board.moverJugador(direction);
         if (result == MoveResult.BLOCKED) {
             return;
         }
+        history.record(previousState);
         moves++;
         if (result == MoveResult.PUSHED) {
             pushes++;
         }
+        status = nextStatus();
+        notifyListeners();
+    }
+
+    public void undo() {
+        if (!canUndo()) {
+            return;
+        }
+        history.undo().ifPresent(board::restaurar);
         status = nextStatus();
         notifyListeners();
     }
@@ -51,7 +65,13 @@ public class Game {
     }
 
     public GameSnapshot snapshot() {
-        return new GameSnapshot(level, moves, pushes, status, board == null ? null : board.snapshot());
+        return new GameSnapshot(level, moves, pushes, history.totalUses(), history.remainingUses(), canUndo(), status,
+                board == null ? null : board.snapshot());
+    }
+
+    private boolean canUndo() {
+        boolean levelInProgress = status == GameStatus.PLAYING || status == GameStatus.UNSOLVABLE;
+        return levelInProgress && history.canUndo();
     }
 
     private GameStatus nextStatus() {

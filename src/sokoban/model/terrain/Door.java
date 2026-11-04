@@ -12,8 +12,14 @@ public class Door extends Terreno implements LockListener {
         this.letter = letter;
     }
 
+    @Override
     public boolean isOpen() {
         return open;
+    }
+
+    @Override
+    public void restoreOpen(boolean open) {
+        this.open = open;
     }
 
     @Override

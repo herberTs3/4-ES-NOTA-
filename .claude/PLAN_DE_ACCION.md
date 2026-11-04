@@ -46,9 +46,9 @@
 | D3 | Provisional, a confirmar: el empuje que deja la frágil en 0 la mueve y después desaparece | 2026-11-04 |
 | D4 | Provisional, a confirmar: todos los destinos cubiertos y cada llave sobre un cerrojo | 2026-11-04 |
 | D5 | Provisional, a confirmar: solo resbalan las cajas | 2026-11-04 |
-| D6 | | |
+| D6 | Provisional, a confirmar: 3 usos consecutivos; un movimiento nuevo reinicia el contador | 2026-11-04 |
 | D7 | | |
-| D8 | | |
+| D8 | Provisional, a confirmar: deshacer no descuenta movimientos ni empujes | 2026-11-04 |
 | Extra #1 | | |
 | Extra #2 | | |
 

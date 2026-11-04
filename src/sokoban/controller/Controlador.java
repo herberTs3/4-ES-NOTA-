@@ -46,6 +46,10 @@ public class Controlador {
         mover(Direction.RIGHT);
     }
 
+    public void deshacer() {
+        game.undo();
+    }
+
     public void siguienteNivel() {
         if (hayNivelSiguiente()) {
             cargarNivel(nivelActual + 1);

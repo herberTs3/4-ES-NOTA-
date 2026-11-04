@@ -120,6 +120,9 @@ public class PruebaControlador {
         verificar("mover cuenta en la foto", vista.ultimaFoto.moves() == 1);
         c.recargarNivel();
         verificar("reiniciar pone los contadores en cero", c.getNivelActual() == 2 && vista.ultimaFoto.moves() == 0);
+        c.moverArriba();
+        c.deshacer();
+        verificar("deshacer llega al modelo y notifica la foto", vista.ultimaFoto.undoUses() == 1);
     }
 
     static void ganarAvanzaAlSiguienteNivel(CargadorDeNivel cargador) {

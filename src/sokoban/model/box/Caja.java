@@ -38,6 +38,8 @@ public abstract class Caja {
         return false;
     }
 
+    public abstract Caja copiar();
+
     public abstract boolean requiereDestino();
 
     public abstract boolean estaEnLugar(Terreno terreno);

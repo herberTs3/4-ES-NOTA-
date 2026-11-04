@@ -12,6 +12,11 @@ public class CajaLlave extends Caja {
     }
 
     @Override
+    public Caja copiar() {
+        return new CajaLlave(getPosicion());
+    }
+
+    @Override
     public boolean abreCerrojos() {
         return true;
     }

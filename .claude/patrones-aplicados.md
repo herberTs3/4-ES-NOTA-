@@ -12,6 +12,38 @@
 | Observer | Comportamiento | `Game` → `GameListener` → `VentanaPrincipal`; `Lock` → `LockListener` → `Door` | Contadores y tablero al moverse; muros que se abren | ✅ |
 | Template Method | Comportamiento | `Caja.empujar()`, `CajaFragil.despuesDeEmpujar()` | Empujar una caja frágil hasta romperla | ✅ |
 | Factory Method | Creacional | `CreadorTerreno`, `CreadorCaja` y sus creadores concretos | Abrir un .txt y mostrar el nivel cargado | ✅ |
+| Memento | Comportamiento | `Tablero` (Originator), `BoardMemento`, `MoveHistory` (Caretaker) | Romper una caja frágil y deshacer: vuelve intacta | ✅ |
+| Prototype | Creacional | `Caja.copiar()` y sus redefiniciones | Apoya al Memento; el reinicio todavía relee el .txt | 🔶 |
+
+## Memento — Comportamiento
+
+- **Dónde**: `sokoban.model.Tablero`, `sokoban.model.BoardMemento`, `sokoban.model.history.MoveHistory`.
+- **Problema**: deshacer tiene que volver atrás cajas deslizadas, cajas frágiles rotas y muros abiertos. Invertir cada movimiento sería complejo y fácil de romper.
+- **Solución / roles**:
+  - Originator → `Tablero`: crea el memento y sabe restaurarse.
+  - Memento → `BoardMemento`: guarda jugador, cajas y aperturas. Sus lecturas son de paquete.
+  - Caretaker → `MoveHistory`: guarda hasta 15 mementos, retrocede 5 y cuenta 3 usos consecutivos, sin leer el contenido.
+- **Consecuencias**:
+  - Ventajas: restaura todo el estado y no rompe el encapsulamiento.
+  - Desventajas / costo: guarda una copia por movimiento; con 15 y tableros chicos no es un problema.
+- **Alternativa descartada**: Command con `undo()`, porque obligaría a invertir deslizamientos, roturas y aperturas. Command encapsula acciones; Memento encapsula estado.
+- **Principios relacionados**: SRP, Fabricación pura, Experto.
+- **Cómo mostrarlo en la demo**: romper una caja frágil, tocar Deshacer y ver que vuelve con su resistencia; repetir con un muro abierto.
+
+## Prototype — Creacional (parcial)
+
+- **Dónde**: `Caja.copiar()`, `CajaNormal`, `CajaFragil`, `CajaLlave`.
+- **Problema**: el memento necesita copias de cajas sin conocer cada clase concreta, y la frágil tiene que conservar su resistencia.
+- **Solución / roles**:
+  - Prototype → `Caja`.
+  - ConcretePrototype → `CajaNormal`, `CajaFragil`, `CajaLlave`.
+  - Cliente → `Tablero`.
+- **Consecuencias**:
+  - Ventajas: una caja nueva solo implementa su copia.
+  - Desventajas / costo: cada subclase tiene que mantener `copiar()` al día.
+- **Alternativa descartada**: copiar según el tipo con un `switch` en `Tablero`.
+- **Principios relacionados**: OCP, Polimorfismo.
+- **Cómo mostrarlo en la demo**: explicarlo junto con Memento. Falta usarlo para el reinicio.
 
 ## MVC con DTOs — Arquitectura
 

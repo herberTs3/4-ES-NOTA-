@@ -12,6 +12,11 @@ public class CajaNormal extends Caja {
     }
 
     @Override
+    public Caja copiar() {
+        return new CajaNormal(getPosicion());
+    }
+
+    @Override
     public boolean requiereDestino() {
         return true;
     }
