@@ -19,20 +19,35 @@ Versión del clásico juego de ingenio Sokoban desarrollada en Java con la libre
 * Sistema Undo, puntaje, imágenes y sonido.
 
 -- Cómo ejecutar
-Requiere JDK 16 o superior. Desde la raíz del proyecto:
+Requiere JDK 16 o superior. En VS Code, elegir la configuración **Sokoban** en Ejecutar y depurar.
+
+Por consola, desde la raíz del proyecto. En PowerShell:
+
+```powershell
+javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
+java -cp out sokoban.Main
+```
+
+En Git Bash, Linux o macOS:
 
 ```bash
 javac -encoding UTF-8 -d out $(find src -name "*.java")
 java -cp out sokoban.Main
 ```
 
-Pruebas:
+Pruebas, en PowerShell:
 
-```bash
-javac -encoding UTF-8 -d out $(find src test -name "*.java")
+```powershell
+javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src,test -Filter *.java).FullName
 java -cp out sokoban.level.PruebaRegistro
 java -cp out sokoban.controller.PruebaControlador
 java -cp out sokoban.model.PruebaJuego
+```
+
+En Git Bash, Linux o macOS, cambiar la primera línea por:
+
+```bash
+javac -encoding UTF-8 -d out $(find src test -name "*.java")
 ```
 
 -- Controles

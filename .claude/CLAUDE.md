@@ -25,8 +25,7 @@ oralmente: **todo lo que generes tiene que poder ser explicado por el equipo**.
    simple factory, no GoF). En la defensa el profe pregunta por los roles (Originator, Caretaker, Invoker…).
 4. **Workflow por ítems con aprobación** (`workflow.md`): plan → aprobación → un ítem por vez → commit sugerido.
 5. Después de implementar un patrón, **registrarlo en `patrones-aplicados.md`** (alimenta el informe técnico y la demo).
-6. Código en inglés, textos de UI en español, sin comentarios en el código (`code-style.md`).
-7. No hacer `git push`. Sugerir commits; el equipo decide cuándo commitear.
+6. Código en inglés, textos de UI en español, sin comentarios en el código (`code-style.md`)..
 8. Si el repo ya tiene una estructura/decisión distinta a la que proponen estos documentos,
    **el repo manda**: avisar la diferencia y proponer actualizar el documento.
 9. El uso de IA está permitido **siempre que se declare en el informe técnico**.
@@ -50,9 +49,16 @@ oralmente: **todo lo que generes tiene que poder ser explicado por el equipo**.
 
 ## Comandos útiles
 
-```bash
-# Compilar (sin Maven; ajustar si el repo usa Maven/IntelliJ con otra salida)
-javac -d out $(find src -name "*.java") && cp -r resources/* out/ 2>/dev/null
-# Ejecutar
-java -cp out Main
+```powershell
+# PowerShell: compilar y ejecutar desde la raíz del repo
+javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
+java -cp out sokoban.Main
 ```
+
+```bash
+# Git Bash: compilar y ejecutar desde la raíz del repo
+javac -encoding UTF-8 -d out $(find src -name "*.java")
+java -cp out sokoban.Main
+```
+
+En VS Code, usar las configuraciones de `.vscode/launch.json` (Sokoban y las pruebas).
