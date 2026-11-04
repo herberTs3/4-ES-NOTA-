@@ -1,0 +1,68 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(javac:*)",
+      "Bash(java:*)",
+      "Bash(jar:*)",
+      "Bash(mvn:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Read(./**)",
+      "Write(./src/**)",
+      "Edit(./src/**)",
+      "Write(./resources/**)",
+      "Edit(./resources/**)",
+      "Write(./docs/**)",
+      "Edit(./docs/**)",
+      "Write(./README.md)",
+      "Edit(./README.md)",
+      "Write(./CREDITS.md)",
+      "Edit(./CREDITS.md)",
+      "Edit(./.claude/PLAN_DE_ACCION.md)",
+      "Edit(./.claude/requirements.md)",
+      "Edit(./.claude/patrones-aplicados.md)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean:*)",
+      "Write(./.claude/settings.json)",
+      "Edit(./.claude/settings.json)",
+      "Write(./.claude/hooks/**)",
+      "Edit(./.claude/hooks/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-java.sh\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -n \"$(git status --porcelain 2>/dev/null)\" ]; then echo 'Hay cambios sin commitear. Considerá commitear el ítem terminado antes de seguir.'; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
