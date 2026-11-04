@@ -1,0 +1,9 @@
+; Nivel 3 - Llaves, cerrojos y cajas fragiles
+; a = caja llave (abre el cerrojo A), 3 = caja fragil con 3 movimientos
+##########
+#@   #   #
+# a  # . #
+#    A   #
+# 3  # . #
+#  $ #   #
+##########
