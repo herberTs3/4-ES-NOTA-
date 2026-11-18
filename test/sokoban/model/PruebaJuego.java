@@ -18,7 +18,7 @@ public class PruebaJuego {
 
     private static final CargarNivelPorTxt CARGADOR = new CargarNivelPorTxt(Path.of("levels"));
     private static final List<String> PASILLO = List.of("#########", "#@      #", "#$.     #", "#########");
-    private static final String SOLUCION_NIVEL_6 = "RRDDL" + "l" + "R" + ">" + "ULLLD" + "RRRRRR";
+    private static final String SOLUCION_NIVEL_6 = "RRDDL" + "r" + "R" + ">" + "ULLLD" + "RRRRRR";
     private static final String SOLUCION_NIVEL_4 = "LUURR" + "URRDDRRDDR" + "UULLLUULLLDD" + "RRRR" + "RRRRR" + "DRU"
             + "DRRUULDD" + "LLULLLLLLDDL" + "ULURRR" + "RRRRRR" + "DRRUULD" + "RDL";
     private static final String SOLUCION_NIVEL_5 = "UURR" + "DRRR" + "R" + "URRRRD" + "RRRRR"
@@ -288,22 +288,48 @@ public class PruebaJuego {
     }
 
     static void laSuperfuerzaJalaCajas() throws Exception {
-        Game bloqueada = iniciar("#######", "#F    #", "#$@# .#", "#######");
-        jugar(bloqueada, "ULRDl");
-        verificar("P08: no jala si atrás hay un muro", bloqueada.snapshot().moves() == 4
-                && poder(bloqueada, TipoPowerUp.SUPERFUERZA).turnosRestantes() == 13);
-        Game normal = iniciar("#########", "#@H #  .#", "#   #   #", "#$F     #", "#########");
-        jugar(normal, "RDDl");
+        Game bloqueada = iniciar("########", "#@F$# .#", "#      #", "########");
+        jugar(bloqueada, "Rr");
+        verificar("P08: no mueve la caja hacia una pared", bloqueada.snapshot().moves() == 1
+                && bloqueada.snapshot().board().boxes().get(0).position().column() == 3
+                && poder(bloqueada, TipoPowerUp.SUPERFUERZA).turnosRestantes() == 15);
+        Game normal = iniciar("#######", "#@F$ .#", "#######");
+        jugar(normal, "Rr");
         BoxData caja = normal.snapshot().board().boxes().get(0);
-        verificar("P07: el jugador retrocede y la caja lo sigue", caja.position().column() == 2
-                && normal.snapshot().board().player().column() == 3);
+        verificar("P07: shift y flecha derecha mueven la caja hacia la derecha",
+                caja.position().column() == 4);
+        verificar("al jalar, el jugador también se mueve en la dirección indicada",
+                normal.snapshot().board().player().column() == 3);
         verificar("jalar no cuenta como empuje", normal.snapshot().pushes() == 0);
-        Game fragil = iniciar("#######", "#F    #", "#2@  .#", "#######");
-        jugar(fragil, "ULRDl");
-        verificar("P12: jalar no gasta la resistencia de la frágil", fragil.snapshot().board().boxes().get(0)
-                .resistance() == 2);
-        Game llave = iniciar("#########", "#F@  $. #", "#Ka   A #", "#########");
-        jugar(llave, "LRDl");
+        Game desdeLaDerecha = iniciar("########", "#F$@ . #", "#      #", "########");
+        jugar(desdeLaDerecha, "DLLUDRRUr");
+        verificar("desde la derecha, jugador y caja avanzan hacia la derecha",
+                posicionDeCaja(desdeLaDerecha, BoxType.NORMAL).column() == 3
+                        && desdeLaDerecha.snapshot().board().player().column() == 4);
+        Game desdeOtroLado = iniciar("########", "#      #", "# $F  .#", "#  @   #", "########");
+        jugar(desdeOtroLado, "Uu");
+        verificar("jugador y caja se mueven juntos al jalar hacia arriba",
+                posicionDeCaja(desdeOtroLado, BoxType.NORMAL).row() == 1
+                        && posicionDeCaja(desdeOtroLado, BoxType.NORMAL).column() == 2
+                        && desdeOtroLado.snapshot().board().player().row() == 1
+                        && desdeOtroLado.snapshot().board().player().column() == 3);
+        Game diagonal = iniciar("#######", "#@F  .#", "#  $  #", "#######");
+        jugar(diagonal, "Rr");
+        verificar("no se puede jalar una caja en diagonal",
+                diagonal.snapshot().moves() == 1
+                        && posicionDeCaja(diagonal, BoxType.NORMAL).row() == 2
+                        && posicionDeCaja(diagonal, BoxType.NORMAL).column() == 3);
+        Game fragilMovida = iniciar("#######", "#@F2 .#", "#######");
+        jugar(fragilMovida, "Rr");
+        verificar("jalar reduce la resistencia de una caja frágil",
+                fragilMovida.snapshot().board().boxes().get(0).resistance() == 1
+                        && fragilMovida.snapshot().board().boxes().get(0).position().column() == 4);
+        Game fragilRota = iniciar("#######", "#@F2 .#", "#######");
+        jugar(fragilRota, "Rrr");
+        verificar("la caja frágil se rompe al agotarse su resistencia al jalar",
+                fragilRota.snapshot().board().boxes().isEmpty());
+        Game llave = iniciar("#########", "#@FKa  .#", "#$    A #", "#########");
+        jugar(llave, "Rr");
         verificar("P12: jalar la llave sobre su cerrojo abre el muro", abierto(llave, 2, 6));
     }
 

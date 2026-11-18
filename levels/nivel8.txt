@@ -1,0 +1,18 @@
+; Nivel 8 - Deposito de tres sectores
+; La llave K abre A y la L abre B; los cerrojos deben activarse para completar.
+; En el ultimo sector es indispensable usar H para liberar una caja.
+; Un desvio adicional con martillo permite encontrar F (opcional).
+; El hielo acelera cajas; evita romper la caja fragil antes de completar.
+########################
+#        ###           #
+# @ K  a    $ ~~.  4  .#
+#            ###       #
+#####A############A#####
+#           ####       #
+#     L  b    $  .  $ .#
+#                   ## #
+#########B########B#####
+#   H#F#               #
+#     #$   .   $ ~~.   #
+#               ####   #
+########################

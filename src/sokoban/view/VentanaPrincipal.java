@@ -27,6 +27,8 @@ import sokoban.dto.GameSnapshot;
 import sokoban.dto.GameStatus;
 import sokoban.dto.LevelOption;
 import sokoban.model.event.GameListener;
+import sokoban.model.Direction;
+import sokoban.model.puntaje.ResultadoPuntaje;
 
 public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener {
 
@@ -45,6 +47,8 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
     private final JButton botonDeshacer;
     private final JLabel etiquetaEstado = new JLabel(CONTROLS_HINT);
     private boolean jugando;
+    private int ultimoNivelConSnapshot = -1;
+    private int ultimosMovimientos = -1;
 
     public VentanaPrincipal(Controlador controlador) {
         super(WINDOW_TITLE);
@@ -59,18 +63,18 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
         contenedor.add(pantallaDeJuego(controlador), SCREEN_GAME);
         add(contenedor, BorderLayout.CENTER);
 
-        registrarTecla("UP", controlador::moverArriba);
-        registrarTecla("DOWN", controlador::moverAbajo);
-        registrarTecla("LEFT", controlador::moverIzquierda);
-        registrarTecla("RIGHT", controlador::moverDerecha);
-        registrarTecla("ctrl UP", controlador::romperMuroArriba);
-        registrarTecla("ctrl DOWN", controlador::romperMuroAbajo);
-        registrarTecla("ctrl LEFT", controlador::romperMuroIzquierda);
-        registrarTecla("ctrl RIGHT", controlador::romperMuroDerecha);
-        registrarTecla("shift UP", controlador::jalarArriba);
-        registrarTecla("shift DOWN", controlador::jalarAbajo);
-        registrarTecla("shift LEFT", controlador::jalarIzquierda);
-        registrarTecla("shift RIGHT", controlador::jalarDerecha);
+        registrarTeclaDireccion("UP", Direction.UP, controlador::moverArriba);
+        registrarTeclaDireccion("DOWN", Direction.DOWN, controlador::moverAbajo);
+        registrarTeclaDireccion("LEFT", Direction.LEFT, controlador::moverIzquierda);
+        registrarTeclaDireccion("RIGHT", Direction.RIGHT, controlador::moverDerecha);
+        registrarTeclaDireccion("ctrl UP", Direction.UP, controlador::romperMuroArriba);
+        registrarTeclaDireccion("ctrl DOWN", Direction.DOWN, controlador::romperMuroAbajo);
+        registrarTeclaDireccion("ctrl LEFT", Direction.LEFT, controlador::romperMuroIzquierda);
+        registrarTeclaDireccion("ctrl RIGHT", Direction.RIGHT, controlador::romperMuroDerecha);
+        registrarTeclaDireccion("shift UP", Direction.UP, controlador::jalarArriba);
+        registrarTeclaDireccion("shift DOWN", Direction.DOWN, controlador::jalarAbajo);
+        registrarTeclaDireccion("shift LEFT", Direction.LEFT, controlador::jalarIzquierda);
+        registrarTeclaDireccion("shift RIGHT", Direction.RIGHT, controlador::jalarDerecha);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(640, 480));
@@ -80,7 +84,11 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
 
     @Override
     public void onGameChanged(GameSnapshot snapshot) {
-        vista.setTablero(snapshot.board(), snapshot.powerUpsEnMapa());
+        boolean huboMovimiento = snapshot.level() == ultimoNivelConSnapshot
+                && snapshot.moves() == ultimosMovimientos + 1;
+        vista.setTablero(snapshot.board(), snapshot.powerUpsEnMapa(), snapshot.powerUpsActivos(), huboMovimiento);
+        ultimoNivelConSnapshot = snapshot.level();
+        ultimosMovimientos = snapshot.moves();
         hud.update(snapshot);
         botonDeshacer.setEnabled(snapshot.canUndo());
         if (snapshot.status() == GameStatus.UNSOLVABLE) {
@@ -133,9 +141,12 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
     }
 
     @Override
-    public void mostrarNivelCompletado(GameSnapshot resumen) {
-        String detalle = String.format("Nivel %d completado.%nMovimientos: %d%nEmpujes: %d%nUsos de deshacer: %d",
-                resumen.level(), resumen.moves(), resumen.pushes(), resumen.undoUses());
+    public void mostrarNivelCompletado(GameSnapshot resumen, ResultadoPuntaje puntaje) {
+        String detalle = String.format(
+                "Nivel %d completado.%n%nPuntaje: %d / 1000%nPolítica: %s%n%n"
+                + "Movimientos: %d%nEmpujes: %d%nUsos de deshacer: %d",
+                resumen.level(), puntaje.puntos(), puntaje.politicaAplicada(),
+                resumen.moves(), resumen.pushes(), resumen.undoUses());
         JOptionPane.showMessageDialog(this, detalle, "¡Nivel completado!", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -177,6 +188,14 @@ public class VentanaPrincipal extends JFrame implements VistaJuego, GameListener
     private void mostrarPantalla(String pantalla) {
         jugando = SCREEN_GAME.equals(pantalla);
         pantallas.show(contenedor, pantalla);
+    }
+
+    /** La orientacion es visual y no requiere nuevos atributos en Jugador ni en Game. */
+    private void registrarTeclaDireccion(String tecla, Direction direccion, Runnable accion) {
+        registrarTecla(tecla, () -> {
+            vista.orientarJugador(direccion);
+            accion.run();
+        });
     }
 
     private void registrarTecla(String tecla, Runnable accion) {

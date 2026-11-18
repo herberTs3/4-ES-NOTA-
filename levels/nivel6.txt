@@ -1,7 +1,16 @@
-; Nivel 6 - Poderes
-; H = martillo (Ctrl + flecha rompe un muro interior), F = superfuerza (Shift + flecha jala una caja)
-##########
-#@ H     #
-#  F #   #
-#$   #  .#
-##########
+; Nivel 6 - Patio de obra: eleccion y eficiencia
+; La caja llave K sobre a abre los DOS accesos A.
+; H y F son opcionales: se puede completar sin recoger ninguno.
+; Una caja extra queda encerrada detras de un muro interior rompible.
+######################
+#         #       #  #
+#      #  # H    #$# #
+#      #  A   .   #  #
+#      #  #    $~~.  #
+# @ K a#  ### $      #
+#         # # .  $.  #
+#  ### #  #     #    #
+#         A     # #  #
+#         #   5 # #F #
+#         #     .    #
+######################
