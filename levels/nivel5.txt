@@ -1,0 +1,11 @@
+; Nivel 5 - Tres llaves
+; K abre a, L abre b, M abre c. El cerrojo b abre dos muros B.
+###################
+#     #     #     #
+# K a #     # .   #
+# $   AL~~~ B  M c#
+#@    #    b#  .  #
+###B#####C#########
+#   $ # 4  . #
+#     #      #
+##############

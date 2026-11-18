@@ -1,0 +1,17 @@
+; Nivel 7 - Los dos candados
+; Activa K/a para abrir las dos puertas A, y L/b para abrir las dos puertas B.
+; El martillo H permite entrar al compartimiento sellado que contiene F (opcional).
+; Cinco destinos, una caja de repuesto, hielo y una caja fragil.
+#######################
+#         #     ##  . #
+#     #   #   H#F#    #
+#     #   A     ##  # #
+#     #   # $ .  B    #
+#   .     # L  b # $  #
+# @ K  a  #  ## ###   #
+#         #      #  . #
+#   $     # $~.  # .  #
+#         A      B  4 #
+#    #### # $    #    #
+#         #      #    #
+#######################

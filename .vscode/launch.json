@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Sokoban",
+      "request": "launch",
+      "mainClass": "sokoban.Main",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Pruebas: juego",
+      "request": "launch",
+      "mainClass": "sokoban.model.PruebaJuego",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Pruebas: controlador",
+      "request": "launch",
+      "mainClass": "sokoban.controller.PruebaControlador",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Pruebas: carga de niveles",
+      "request": "launch",
+      "mainClass": "sokoban.level.PruebaRegistro",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
