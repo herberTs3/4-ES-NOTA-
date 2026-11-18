@@ -24,15 +24,29 @@ public abstract class Caja {
         posicion = posicion.next(direccion);
         deslizar(direccion, tablero);
         tablero.getTerreno(posicion).alEntrarCaja(this);
-        despuesDeEmpujar();
+        despuesDeMover();
     }
 
     public final void jalarA(Posicion destino, Tablero tablero) {
+        if (!puedeSerJalada()) {
+            throw new IllegalStateException("Esta caja no puede jalarse en su estado actual");
+        }
         posicion = Objects.requireNonNull(destino);
         tablero.getTerreno(posicion).alEntrarCaja(this);
+        despuesDeJalar();
     }
 
-    protected void despuesDeEmpujar() {
+    /** Las cajas normales y llave conservan su comportamiento previo. */
+    public boolean puedeSerJalada() {
+        return true;
+    }
+
+    protected void despuesDeMover() {
+    }
+
+    /** Por compatibilidad, el comportamiento por defecto sigue siendo el de mover. */
+    protected void despuesDeJalar() {
+        despuesDeMover();
     }
 
     public boolean estaRota() {

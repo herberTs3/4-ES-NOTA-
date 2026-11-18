@@ -145,7 +145,7 @@ public class Controlador {
 
     private void terminarNivel() {
         progreso.complete(nivelActual);
-        vista.mostrarNivelCompletado(game.snapshot());
+        vista.mostrarNivelCompletado(game.snapshot(), game.calcularPuntaje());
         if (cargador.existeNivel(nivelActual + 1)) {
             cargarNivel(nivelActual + 1);
         } else {

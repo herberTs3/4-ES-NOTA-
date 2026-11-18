@@ -4,6 +4,7 @@ import java.util.List;
 
 import sokoban.dto.GameSnapshot;
 import sokoban.dto.LevelOption;
+import sokoban.model.puntaje.ResultadoPuntaje;
 
 public interface VistaJuego {
 
@@ -17,7 +18,7 @@ public interface VistaJuego {
 
     void mostrarError(int numeroDeNivel, String motivo);
 
-    void mostrarNivelCompletado(GameSnapshot resumen);
+    void mostrarNivelCompletado(GameSnapshot resumen, ResultadoPuntaje puntaje);
 
     void mostrarJuegoTerminado();
 }

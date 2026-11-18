@@ -117,14 +117,32 @@ public class Tablero {
     }
 
     public boolean jalarCaja(Direction direccion) {
-        Posicion anterior = jugador.getPosicion();
-        Posicion atras = anterior.next(direccion.opuesta());
-        Optional<Caja> caja = getCajaEn(anterior.next(direccion));
-        if (caja.isEmpty() || !puedeRecibirCaja(atras)) {
+        Posicion posicionJugador = jugador.getPosicion();
+        Caja caja = null;
+        for (Direction lado : Direction.values()) {
+            Optional<Caja> candidata = getCajaEn(posicionJugador.next(lado));
+            if (candidata.isEmpty()) {
+                continue;
+            }
+            if (caja != null) {
+                return false;
+            }
+            caja = candidata.get();
+        }
+        if (caja == null) {
             return false;
         }
-        jugador.moverA(atras);
-        caja.get().jalarA(anterior, this);
+        Posicion destinoJugador = posicionJugador.next(direccion);
+        Posicion destinoCaja = caja.getPosicion().next(direccion);
+        if (!esTransitable(destinoJugador) || !puedeRecibirCaja(destinoCaja)
+                || (getCajaEn(destinoJugador).isPresent() && !destinoJugador.equals(caja.getPosicion()))) {
+            return false;
+        }
+        jugador.moverA(destinoJugador);
+        caja.jalarA(destinoCaja, this);
+        if (caja.estaRota()) {
+            cajas.remove(caja);
+        }
         return true;
     }
 

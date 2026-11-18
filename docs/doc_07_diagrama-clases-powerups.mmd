@@ -1,0 +1,132 @@
+%% SOKOBAN - DECORATOR + FACTORY METHOD + RECOLECCION (PROPUESTA)
+%% RegistroDeCreadores interpretara H/F: el cargador NO crea ni normaliza el powerup.
+%% La creacion del terreno base permanece en el registro.
+%% TipoPowerUp, EstadoPowerUp y PowerUpData van en el paquete dto: la vista los recibe sin conocer el modelo.
+classDiagram
+    direction TB
+
+    class CargarNivelPorTxt {
+        -RegistroDeCreadores registro
+        +cargarDesdeLineas(List~String~) Tablero
+    }
+    class RegistroDeCreadores {
+        -List~CreadorTerreno~ creadoresDeTerreno
+        -List~CreadorCaja~ creadoresDeCaja
+        -List~CreadorPowerUp~ creadoresDePowerUp
+        +registrarPowerUp(CreadorPowerUp) RegistroDeCreadores
+        +crearTerreno(char) Terreno
+        +crearCaja(char,Posicion) Optional~Caja~
+        +crearPowerUp(char,Posicion) Optional~PowerUpEnMapa~
+        -hayCreadorDePowerUpPara(char) boolean
+    }
+    class CreadorPowerUp {
+        <<interface>>
+        +reconoce(char) boolean
+        +crear(char,Posicion) PowerUpEnMapa
+    }
+    class CreadorMartillo {
+        +reconoce(char) boolean
+        +crear(char,Posicion) PowerUpEnMapa
+    }
+    class CreadorSuperFuerza {
+        +reconoce(char) boolean
+        +crear(char,Posicion) PowerUpEnMapa
+    }
+    class PowerUpEnMapa {
+        <<record>>
+        +TipoPowerUp tipo
+        +Posicion posicion
+    }
+    class TipoPowerUp {
+        <<enumeration>>
+        MARTILLO
+        SUPERFUERZA
+        +estadoInicial() EstadoPowerUp
+    }
+    class EstadoPowerUp {
+        <<record>>
+        +TipoPowerUp tipo
+        +int turnosRestantes
+        +int usosRestantes
+    }
+    class PowerUpData {
+        <<record>>
+        +TipoPowerUp tipo
+        +CellPosition position
+    }
+    class BoardMemento {
+        -Set~Posicion~ brokenWalls
+        -List~PowerUpEnMapa~ powerUps
+        -List~EstadoPowerUp~ activePowerUps
+    }
+    class Tablero {
+        -List~PowerUpEnMapa~ powerUpsEnMapa
+        -boolean[][] murosProtegidos
+        +moverJugador(Direction) MoveResult
+        +romperMuroInterior(Direction) boolean
+        +jalarCaja(Direction) boolean
+        +recogerPowerUpEnJugador() Optional~TipoPowerUp~
+    }
+    class Game {
+        -AccionesJugador accionesJugador
+        -List~PowerUpDecorador~ powerUpsActivos
+        +move(Direction) void
+        +romperMuro(Direction) void
+        +jalarCaja(Direction) void
+        -reconstruirPoderes(List~EstadoPowerUp~) void
+    }
+    class AccionesJugador {
+        <<interface>>
+        +mover(Direction) MoveResult
+        +romperMuro(Direction) boolean
+        +jalarCaja(Direction) boolean
+    }
+    class JugadorBase {
+        -Tablero tablero
+    }
+    class PowerUpDecorador {
+        <<abstract>>
+        #AccionesJugador componente
+        #Tablero tablero
+        #int turnosRestantes
+        +estado() EstadoPowerUp
+        +avanzarTurno() void
+        +estaActivo() boolean
+    }
+    class MartilloDecorador {
+        -int usosRestantes
+        +romperMuro(Direction) boolean
+    }
+    class SuperFuerzaDecorador {
+        +jalarCaja(Direction) boolean
+    }
+    class TerrenoNormal
+    class Terreno
+
+    CargarNivelPorTxt --> RegistroDeCreadores : consulta
+    CargarNivelPorTxt ..> Tablero : construye
+    RegistroDeCreadores o-- "0..*" CreadorPowerUp : registra
+    CreadorPowerUp <|.. CreadorMartillo
+    CreadorPowerUp <|.. CreadorSuperFuerza
+    CreadorPowerUp ..> PowerUpEnMapa : crea
+    CreadorMartillo ..> TipoPowerUp : H
+    CreadorSuperFuerza ..> TipoPowerUp : F
+    RegistroDeCreadores ..> TerrenoNormal : piso subyacente
+    Terreno <|-- TerrenoNormal
+    Tablero *-- "0..*" PowerUpEnMapa : pendientes
+    PowerUpEnMapa --> TipoPowerUp
+    Game --> Tablero : recoge
+    Game --> AccionesJugador : utiliza
+    AccionesJugador <|.. JugadorBase
+    AccionesJugador <|.. PowerUpDecorador
+    PowerUpDecorador <|-- MartilloDecorador
+    PowerUpDecorador <|-- SuperFuerzaDecorador
+    PowerUpDecorador o-- AccionesJugador : envuelve
+    JugadorBase --> Tablero : actúa sobre
+    PowerUpDecorador --> Tablero : actúa sobre
+    PowerUpDecorador ..> EstadoPowerUp : exporta
+    EstadoPowerUp --> TipoPowerUp
+    PowerUpData --> TipoPowerUp
+    PowerUpEnMapa ..> PowerUpData : toData
+    BoardMemento --> EstadoPowerUp : guarda
+    Tablero ..> BoardMemento : crea y restaura

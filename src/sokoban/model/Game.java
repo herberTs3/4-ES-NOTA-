@@ -11,6 +11,13 @@ import sokoban.dto.GameStatus;
 import sokoban.dto.TipoPowerUp;
 import sokoban.model.event.GameListener;
 import sokoban.model.history.MoveHistory;
+import sokoban.model.puntaje.AnalizadorNivel;
+import sokoban.model.puntaje.CalculadorPuntaje;
+import sokoban.model.puntaje.CaracteristicasNivel;
+import sokoban.model.puntaje.EstadisticasNivel;
+import sokoban.model.puntaje.PoliticaPuntaje;
+import sokoban.model.puntaje.ResultadoPuntaje;
+import sokoban.model.puntaje.SelectorPoliticaPuntaje;
 import sokoban.model.powerup.AccionesJugador;
 import sokoban.model.powerup.JugadorBase;
 import sokoban.model.powerup.PowerUpDecorador;
@@ -20,6 +27,10 @@ public class Game {
     private final List<GameListener> listeners = new ArrayList<>();
     private final MoveHistory history = new MoveHistory();
     private final List<PowerUpDecorador> powerUpsActivos = new ArrayList<>();
+    private final AnalizadorNivel analizadorNivel = new AnalizadorNivel();
+    private final SelectorPoliticaPuntaje selectorPuntaje = new SelectorPoliticaPuntaje();
+    private final CalculadorPuntaje calculadorPuntaje = new CalculadorPuntaje();
+    private CaracteristicasNivel caracteristicasIniciales;
     private AccionesJugador accionesJugador;
     private Tablero board;
     private int level;
@@ -32,7 +43,14 @@ public class Game {
     }
 
     public void startLevel(Tablero newBoard, int levelNumber) {
-        board = Objects.requireNonNull(newBoard);
+        Tablero nuevo = Objects.requireNonNull(newBoard);
+        // Se analiza el tablero original una sola vez. La politica queda fija
+        // para este intento, aunque luego se recojan poderes o se rompan muros.
+        CaracteristicasNivel caracteristicas = analizadorNivel.analizar(nuevo.snapshot(), nuevo.powerUpsEnMapa());
+        PoliticaPuntaje seleccionada = selectorPuntaje.seleccionar(caracteristicas);
+        calculadorPuntaje.establecerPolitica(seleccionada);
+        caracteristicasIniciales = caracteristicas;
+        board = nuevo;
         level = levelNumber;
         moves = 0;
         pushes = 0;
@@ -65,6 +83,15 @@ public class Game {
 
     public boolean isLevelCompleted() {
         return status == GameStatus.LEVEL_COMPLETED;
+    }
+
+    /** Solo se solicita al terminar el nivel; el calculador aplica la politica seleccionada al iniciar. */
+    public ResultadoPuntaje calcularPuntaje() {
+        if (!isLevelCompleted()) {
+            throw new IllegalStateException("El nivel aun no fue completado");
+        }
+        EstadisticasNivel estadisticas = new EstadisticasNivel(level, moves, pushes, history.totalUses());
+        return calculadorPuntaje.calcular(estadisticas);
     }
 
     public GameSnapshot snapshot() {
