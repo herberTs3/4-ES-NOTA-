@@ -6,7 +6,7 @@ Profesor: Jonathan Pepe
 **Equipo:** 4 es nota
 
 ## Descripción
-Versión del clásico juego de ingenio Sokoban desarrollada en Java con la librería Swing (GUI 2D). El objetivo principal del proyecto es aplicar los patrones y principios de diseño vistos en la cursada (SOLID, GRASP, MVC, GOF).
+Versión del clásico juego de ingenio Sokoban desarrollada en Java con la librería Swing. El objetivo principal del proyecto es aplicar los patrones y principios de diseño vistos en la cursada (SOLID, GRASP, MVC, GOF).
 
 -- Funcionalidades implementadas
 * **Carga de niveles:** Los mapas se cargan desde archivos `.txt` en la carpeta `levels`.
@@ -21,37 +21,6 @@ Versión del clásico juego de ingenio Sokoban desarrollada en Java con la libre
 -- En desarrollo
 * Puntaje, imágenes y efectos de sonido.
 
--- Cómo ejecutar
-Requiere JDK 16 o superior. En VS Code, elegir la configuración **Sokoban** en Ejecutar y depurar.
-
-Por consola, desde la raíz del proyecto. En PowerShell:
-
-```powershell
-javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src -Filter *.java).FullName
-java -cp out sokoban.Main
-```
-
-En Git Bash, Linux o macOS:
-
-```bash
-javac -encoding UTF-8 -d out $(find src -name "*.java")
-java -cp out sokoban.Main
-```
-
-Pruebas, en PowerShell:
-
-```powershell
-javac -encoding UTF-8 -d out (Get-ChildItem -Recurse src,test -Filter *.java).FullName
-java -cp out sokoban.level.PruebaRegistro
-java -cp out sokoban.controller.PruebaControlador
-java -cp out sokoban.model.PruebaJuego
-```
-
-En Git Bash, Linux o macOS, cambiar la primera línea por:
-
-```bash
-javac -encoding UTF-8 -d out $(find src test -name "*.java")
-```
 
 -- Controles
 * **Flechas direccionales:** Movimiento del jugador.
