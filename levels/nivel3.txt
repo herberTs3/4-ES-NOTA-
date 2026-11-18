@@ -1,0 +1,9 @@
+; Nivel 3 - Llaves, cerrojos y cajas fragiles
+; K = caja llave, a = cerrojo que abre el muro A, 3 = caja fragil con 3 empujes
+###########
+#    #    #
+# K a# .  #
+#  $ A  3 #
+# @  # .  #
+#    #    #
+###########

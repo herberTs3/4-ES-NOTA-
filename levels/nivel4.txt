@@ -1,0 +1,9 @@
+; Nivel 4 - Dos llaves y hielo
+; K abre el cerrojo a, L abre el cerrojo b, A-B = muros, 3 = caja fragil con 3 empujes
+################
+#     #   #    #
+# K a #~~~# .  #
+#  $  A~~~B  3 #
+# @ $ #~~~# .  #
+#     # Lb#  . #
+################

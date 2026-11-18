@@ -1,0 +1,7 @@
+; Nivel 6 - Poderes
+; H = martillo (Ctrl + flecha rompe un muro interior), F = superfuerza (Shift + flecha jala una caja)
+##########
+#@ H     #
+#  F #   #
+#$   #  .#
+##########
